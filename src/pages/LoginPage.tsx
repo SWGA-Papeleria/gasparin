@@ -48,7 +48,7 @@ export default function LoginPage() {
   return (
     <Container size={420} my={40}>
       <Title ta="center" fw={900} style={{ fontFamily: 'Greycliff CF, sans-serif' }}>
-        Iniciar sesión
+        Iniciarr sesión
       </Title>
 
       <Paper withBorder shadow="md" p={30} mt={30} radius="md">
