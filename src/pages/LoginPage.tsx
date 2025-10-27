@@ -15,7 +15,6 @@ import {
   Stack,
   Alert,
 } from '@mantine/core';
-import { useAppTitle } from '../hooks/useAppTitle';
 import { IconAlertCircle } from '@tabler/icons-react';
 
 export default function LoginPage() {
