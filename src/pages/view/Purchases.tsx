@@ -245,7 +245,7 @@ export default function Purchases() {
             </div>
             <Button 
               leftSection={<IconPlus size="1rem" />}
-              onClick={() => navigate('/compras/nueva')}
+              onClick={() => navigate('nueva')}
             >
               Nueva Compra
             </Button>

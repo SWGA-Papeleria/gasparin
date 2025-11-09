@@ -394,7 +394,7 @@ useEffect(() => {
                 <Route path="atributos" element={<Attributes />} />
                 <Route path="ventas" element={<Sales />} /> 
                 <Route path="compras" element={<Purchases />} />
-                <Route path="/compras/nueva" element={<NewPurchase />} />
+                <Route path="compras/nueva" element={<NewPurchase />} />
                 <Route path="clientes" element={<Text size="xl">Página de Clientes</Text>} />
                 <Route path="proveedores" element={<Text size="xl">Página de Proveedores</Text>} />
                 <Route path="pedidos" element={<Text size="xl">Página de Pedidos</Text>} />
