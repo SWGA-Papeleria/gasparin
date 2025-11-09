@@ -46,7 +46,7 @@ export default function Keypad({ onPinSubmit, message, pinLength }: KeypadProps)
             style={{ 
                 width: rem(360), 
                 textAlign: 'center',
-                backgroundColor: '#2D2D2D', // Dark grey background
+                backgroundColor: '#2D2D2D', 
             }} 
         >
             <Title order={3} mb="xs" style={{ color: 'white' }}>Bloqueo de TPV</Title>

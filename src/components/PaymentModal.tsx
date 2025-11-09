@@ -16,7 +16,7 @@ import {
 import { 
     IconX,
 } from '@tabler/icons-react';
-// import Keypad from './Keypad'; // Ya no se usa directamente el componente Keypad, sino su lógica
+// import Keypad from './Keypad'; 
 
 // Tipos de datos para el pago
 interface Payment {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Loader, Center } from '@mantine/core'; // Usaremos Loader para simular la carga
+import { Loader, Center } from '@mantine/core'; 
 
 interface ProtectedRouteProps {
   children: React.ReactNode;

@@ -39,7 +39,7 @@ export default function LoginPage() {
       navigate('/dashboard', { replace: true });
     } else {
       // Pista de error actualizada con los ejemplos de usuario/email
-      setError('Credenciales incorrectas. (Pista: admin@papeleria.com, ana_super, juan_admin, o luis_emp / Contraseña: 1234)');
+      setError('Credenciales incorrectas. (Pista: propietaria@papeleria.com, ana_super, admin@papeleria.com, juan_admin, o luis_emp / Contraseña: 1234)');
     }
 
     setLoading(false);
