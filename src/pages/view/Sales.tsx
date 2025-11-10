@@ -447,17 +447,15 @@ export default function Sales() {
   const rows = filteredVentas.map((venta) => (
     <Table.Tr key={venta.id_venta}>
       <Table.Td>
-        <Text fw={600}>{venta.folio_venta}</Text>
+        <Text>{venta.folio_venta}</Text>
       </Table.Td>
       <Table.Td>
         <Group gap="xs">
-          <IconCalendar size="1rem" />
           {formatFecha(venta.fecha_venta)}
         </Group>
       </Table.Td>
       <Table.Td>
         <Group gap="xs">
-          <IconUser size="1rem" />
           {venta.cliente_nombre || 'Cliente Mostrador'}
         </Group>
       </Table.Td>

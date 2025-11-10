@@ -45,6 +45,12 @@ import Inventory from '../pages/view/Inventory';
 import Sales from '../pages/view/Sales';
 import Purchases from '../pages/view/Purchases';
 import NewPurchase from '../pages/view/NewPurchase';
+import Orders from '../pages/view/Orders';
+import NewOrder from '../pages/view/NewOrder';
+import Reports from '../pages/view/Reports';
+import Customers from '../pages/view/Customers';
+import Suppliers from '../pages/view/Suppliers';
+import Users from '../pages/view/Users';
 // NUEVOS IMPORTS PARA LOS CATÁLOGOS
 import UnitOfMeasure from '../pages/view/UnitOfMeasure';
 import Attributes from '../pages/view/Attributes';
@@ -395,11 +401,13 @@ useEffect(() => {
                 <Route path="ventas" element={<Sales />} /> 
                 <Route path="compras" element={<Purchases />} />
                 <Route path="compras/nueva" element={<NewPurchase />} />
-                <Route path="clientes" element={<Text size="xl">Página de Clientes</Text>} />
-                <Route path="proveedores" element={<Text size="xl">Página de Proveedores</Text>} />
-                <Route path="pedidos" element={<Text size="xl">Página de Pedidos</Text>} />
-                <Route path="reportes" element={<Text size="xl" c="red">Página de Reportes</Text>} />
-                <Route path="usuarios" element={<Text size="xl" c="blue">Página de Usuarios</Text>} />
+                <Route path="clientes" element={<Customers />} />
+                <Route path="proveedores" element={<Suppliers />} />
+                <Route path="pedidos" element={<Orders />} />
+                <Route path="pedidos/nuevo" element={<NewOrder />} />
+                <Route path="pedidos/editar/:id" element={<NewOrder />} />
+                <Route path="reportes" element={<Reports />} />
+                <Route path="usuarios" element={<Users />} />
                 <Route path="*" element={<Text size="xl" c="orange">404 - Contenido no encontrado</Text>} />
             </Routes>
         </AppShell.Main>

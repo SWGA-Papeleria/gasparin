@@ -505,7 +505,7 @@ export default function NewPurchase() {
               </Grid.Col>
             </Grid>
             
-            <Group justify="center" mt="md">
+            <Group mt="md">
               <Button 
                 variant="light" 
                 leftSection={<IconListDetails size="1rem" />}

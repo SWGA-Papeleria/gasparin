@@ -188,23 +188,20 @@ export default function Purchases() {
   const rows = filteredCompras.map((compra) => (
     <Table.Tr key={compra.id_compra}>
       <Table.Td>
-        <Text fw={600}>C-{compra.id_compra.toString().padStart(3, '0')}</Text>
+        <Text>C-{compra.id_compra.toString().padStart(3, '0')}</Text>
       </Table.Td>
       <Table.Td>
         <Group gap="xs">
-          <IconCalendar size="1rem" />
           {formatFecha(compra.fecha_compra)}
         </Group>
       </Table.Td>
       <Table.Td>
         <Group gap="xs">
-          <IconBuildingStore size="1rem" />
           <Text>{compra.proveedor_nombre}</Text>
         </Group>
       </Table.Td>
       <Table.Td>
         <Group gap="xs">
-          <IconUser size="1rem" />
           {compra.usuario_nombre}
         </Group>
       </Table.Td>

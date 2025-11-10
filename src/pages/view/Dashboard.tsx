@@ -178,7 +178,7 @@ export default function Dashboard() {
         Panel de Control Principal
       </Title>
       <Text c="dimmed" mb="xl">
-        Resumen ejecutivo y métricas clave del negocio
+        Resumen y métricas clave del negocio
       </Text>
       
       {/* Métricas Principales - 6 cards */}
