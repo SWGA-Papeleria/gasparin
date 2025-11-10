@@ -43,8 +43,8 @@ interface User {
 
 // Mapeo de roles
 const ROLES = {
-  1: { label: 'Superusuario', color: 'red' },
-  2: { label: 'Admin', color: 'blue' },
+  1: { label: 'Superusuario', color: 'orange' },
+  2: { label: 'Admin', color: 'red' },
   3: { label: 'Empleado', color: 'green' },
 };
 
