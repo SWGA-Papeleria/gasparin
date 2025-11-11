@@ -136,10 +136,9 @@ export default function Reports() {
           </Group>
         </Paper>
 
-        {/* Filtros */}
+        {/* Filtros - MODIFICADO con estilo de Attributes */}
         <Paper withBorder p="md" shadow="xs">
-          <Title order={4} mb="md">Filtros</Title>
-          <Group>
+          <Group align="flex-end" gap="xs">
             <Select
               placeholder="Todos los módulos"
               data={[
@@ -152,6 +151,7 @@ export default function Reports() {
               onChange={setFiltroModulo}
               clearable
               size="md"
+              style={{ flex: 2 }}
             />
             <Select
               placeholder="Todos los períodos"
@@ -163,6 +163,7 @@ export default function Reports() {
               onChange={setFiltroPeriodo}
               clearable
               size="md"
+              style={{ flex: 2 }}
             />
             <Button 
               variant="subtle" 

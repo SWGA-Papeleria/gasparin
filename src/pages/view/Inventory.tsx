@@ -379,7 +379,7 @@ export default function Inventory() {
             }}
             size="md"
           >
-            Limpiar Filtros
+            Limpiar
           </Button>
         </Group>
       </Paper>
