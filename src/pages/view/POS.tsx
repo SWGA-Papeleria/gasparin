@@ -1,6 +1,6 @@
-// POS.tsx (VERSIÓN FINAL LIMPIA)
+// POS.tsx (VERSIÓN CON MISMOS MÁRGENES QUE ATTRIBUTES)
 import { TextInput } from '@mantine/core';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { 
     Title, 
     Text, 
@@ -15,11 +15,12 @@ import {
     Tooltip,
     Table,
     NumberInput, 
-    Modal,
 } from '@mantine/core';
 
 import { 
+    IconLock, 
     IconDoorExit, 
+    IconCheck, 
     IconTrash, 
 } from '@tabler/icons-react';
 
@@ -27,43 +28,64 @@ import {
 import PaymentModal from '../../components/PaymentModal'; 
 import { ConfirmationScreen } from '../../components/ConfirmationScreen'; 
 
-// Importar hooks
-import { usePOSState } from '../../hooks/pos/usePOSState';
-import { useCart } from '../../hooks/pos/useCart';
-import { useSaleSession } from '../../hooks/pos/useSaleSession';
-import { useCheckout } from '../../hooks/pos/useCheckout';
-import { useProductSearch } from '../../hooks/pos/useProductSearch';
-
-// Importar contexto de autenticación
-import { useAuth } from '../../context/AuthContext';
-
-// Importar tipos
-import type { SaleItem } from '../../hooks/pos/useCart';
-import type { Payment, CheckoutStage } from '../../hooks/pos/useCheckout';
-
 // ------------------------------------------------------------
-// DATOS DE PRUEBA
+// DEFINICIÓN DE TIPOS DE DATOS
 // ------------------------------------------------------------
+interface SaleItem {
+    id: number;
+    name: string;
+    quantity: number;
+    unitPrice: number;
+    subtotal: number;
+}
+
+interface Payment {
+    method: 'Cash' | 'Card' | 'Transfer';
+    amount: number;
+}
+
+type CheckoutStage = 'cart' | 'payment' | 'confirmation'; 
+
+// Datos de prueba actualizados con nombres que incluyen atributos
 const DUMMY_PRODUCTS = [
-    { id: 1, name: 'Cuaderno Profesional', unitPrice: 35.50 },
-    { id: 2, name: 'Lápiz Grafito HB', unitPrice: 5.00 },
-    { id: 3, name: 'Caja de Colores (12)', unitPrice: 89.90 },
-    { id: 4, name: 'Borrador Blanco', unitPrice: 3.50 },
-    { id: 5, name: 'Tijeras Punta Roma', unitPrice: 15.00 },
-    { id: 6, name: 'Pluma Negra', unitPrice: 8.00 },
-    { id: 7, name: 'Block de Notas', unitPrice: 12.00 },
-    { id: 8, name: 'Cinta Adhesiva', unitPrice: 10.50 },
-    { id: 9, name: 'Goma de Borrar', unitPrice: 4.00 },
-    { id: 10, name: 'Marcador Rojo', unitPrice: 6.50 },
-    { id: 11, name: 'Sacapuntas Metal', unitPrice: 9.00 },
-    { id: 12, name: 'Papel Bond (500)', unitPrice: 75.00 },
-    { id: 13, name: 'Folder Manilla', unitPrice: 2.50 },
-    { id: 14, name: 'Clips (Caja)', unitPrice: 11.00 },
-    { id: 15, name: 'Correctores Líquido', unitPrice: 18.00 },
+    { id: 1, name: 'Bolígrafo BIC Azul', unitPrice: 5.50 },
+    { id: 2, name: 'Cuaderno Profesional Rayas', unitPrice: 35.50 },
+    { id: 3, name: 'Lápiz Grafito HB Paquete 12', unitPrice: 15.00 },
+    { id: 4, name: 'Caja de Colores 12 Unidades', unitPrice: 89.90 },
+    { id: 5, name: 'Borrador Blanco Premium', unitPrice: 3.50 },
+    { id: 6, name: 'Tijeras Punta Roma Metal', unitPrice: 15.00 },
+    { id: 7, name: 'Pluma Negra Tinta Permanente', unitPrice: 8.00 },
+    { id: 8, name: 'Block de Notas 100 Hojas', unitPrice: 12.00 },
+    { id: 9, name: 'Cinta Adhesiva Transparente', unitPrice: 10.50 },
+    { id: 10, name: 'Goma de Borrar Suave', unitPrice: 4.00 },
+    { id: 11, name: 'Marcador Rojo Punto Fino', unitPrice: 6.50 },
+    { id: 12, name: 'Sacapuntas Metal Doble', unitPrice: 9.00 },
+    { id: 13, name: 'Papel Bond A4 500 Hojas', unitPrice: 75.00 },
+    { id: 14, name: 'Folder Manilla Tamaño Carta', unitPrice: 2.50 },
+    { id: 15, name: 'Clips Metálicos Caja 100', unitPrice: 11.00 },
 ];
 
+const POS_PIN = '1234'; 
+const PIN_LENGTH = 4;
+
+const STORAGE_KEYS = {
+    SALE_ACTIVE: 'pos_sale_active',
+    IS_LOCKED: 'pos_is_locked', 
+    SALE_ID: 'pos_current_sale_id',
+};
+
+const getInitialState = (key: string, defaultValue: any): any => {
+    try {
+        const storedValue = localStorage.getItem(key);
+        return storedValue ? JSON.parse(storedValue) : defaultValue;
+    } catch (error) {
+        console.error("Error al leer localStorage:", error);
+        return defaultValue;
+    }
+};
+
 // ------------------------------------------------------------
-// COMPONENTE MODAL REUTILIZABLE
+// COMPONENTE MODAL REUTILIZABLE para Monto Inicial y Final 
 // ------------------------------------------------------------
 interface AmountModalProps {
     opened: boolean;
@@ -97,139 +119,248 @@ const AmountModal: React.FC<AmountModalProps> = ({
     if (!opened) return null;
 
     return (
-        <Modal
-            opened={opened}
-            onClose={onClose}
-            title={<Title order={4}>{title}</Title>}
-            size="md"
-            centered
+        <Box
+            style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 200,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            }}
         >
-            <Stack>
-                <Text c="dimmed">{fixedDescription}</Text>
-                
-                <input
-                    type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="0.00"
-                    style={{ padding: '10px', fontSize: '18px', border: '1px solid #ccc', borderRadius: '4px' }}
-                    min="0"
-                    autoFocus
-                />
-                
-                <Group justify="flex-end" gap="xs">
-                    <Button 
-                        onClick={onClose} 
-                        variant="subtle"
-                        size="md"
-                    >
-                        Cancelar
-                    </Button>
-                    <Button onClick={handleSubmit} size="md" color="blue">
-                        {actionLabel}
-                    </Button>
-                </Group>
-            </Stack>
-        </Modal>
+            <Box
+                style={{
+                    backgroundColor: 'white',
+                    borderRadius: '8px',
+                    padding: '24px',
+                    maxWidth: '500px',
+                    width: '90%',
+                }}
+            >
+                <Title order={4} mb="md">{title}</Title>
+                <Stack>
+                    <Text c="dimmed">{fixedDescription}</Text>
+                    
+                    <input
+                        type="number"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        placeholder="0.00"
+                        style={{ padding: '10px', fontSize: '18px', border: '1px solid #ccc', borderRadius: '4px' }}
+                        min="0"
+                        autoFocus
+                    />
+                    
+                    <Group justify="flex-end" gap="xs">
+                        <Button 
+                            onClick={onClose} 
+                            variant="subtle"
+                        >
+                            Cancelar
+                        </Button>
+                        <Button onClick={handleSubmit} size="lg" color="green">
+                            {actionLabel}
+                        </Button>
+                    </Group>
+                </Stack>
+            </Box>
+        </Box>
     );
 };
 
 // ------------------------------------------------------------
-// COMPONENTE PRINCIPAL POS
+// COMPONENTE PRINCIPAL POS 
 // ------------------------------------------------------------
 export default function POS() {
     const posRef = useRef<HTMLDivElement>(null); 
 
-    // Obtener usuario para identificar sesión
-    const { user } = useAuth();
-    const userId = user?.email || user?.name || 'anonymous';
-
-    // USAR TODOS LOS HOOKS CON USER ID
-    const {
-        isSaleActive,
-        currentSaleId,
-        startNewSale,
-        endSaleSession,
-    } = usePOSState(userId);
+    // INICIALIZACIÓN DE ESTADOS CON PERSISTENCIA
+    const [isSaleActive, setIsSaleActive] = useState<boolean>(() => 
+        getInitialState(STORAGE_KEYS.SALE_ACTIVE, false)
+    );
+    const [currentSaleId, setCurrentSaleId] = useState<number | null>(() => 
+        getInitialState(STORAGE_KEYS.SALE_ID, null)
+    );
     
-    const {
-        saleItems,
-        saleTotal,
-        addItemToSale,
-        updateItemQuantity,
-        removeItem,
-        clearCart,
-    } = useCart(userId);
+    // ESTADOS PARA MODALES DE MONTO Y VALORES DE CAJA 
+    const [isInitialAmountModalOpen, setIsInitialAmountModalOpen] = useState(false);
+    const [isClosingAmountModalOpen, setIsClosingAmountModalOpen] = useState(false);
+    const [initialCashAmount, setInitialCashAmount] = useState<number | null>(null);
+    const [closingCashAmount, setClosingCashAmount] = useState<number | null>(null);
 
-    const {
-        isInitialAmountModalOpen,
-        isClosingAmountModalOpen,
-        openInitialAmountModal,
-        closeInitialAmountModal,
-        openClosingAmountModal,
-        closeClosingAmountModal,
-        submitInitialAmount,
-        submitClosingAmount,
-        resetSession,
-    } = useSaleSession();
+    // ESTADOS DE LA VENTA 
+    const [saleItems, setSaleItems] = useState<SaleItem[]>([]); 
+    const [checkoutStage, setCheckoutStage] = useState<CheckoutStage>('cart');
+    const [payments, setPayments] = useState<Payment[]>([]); 
+    const [changeDue, setChangeDue] = useState<number>(0);
+    const [searchTerm, setSearchTerm] = useState<string>(''); 
 
-    const {
-        checkoutStage,
-        payments,
-        changeDue,
-        startPayment,
-        completePayment,
-        startNewOrder,
-        cancelPayment,
-    } = useCheckout();
+    // --- FILTRADO DE PRODUCTOS --- 
+    const filteredProducts = useMemo(() => {
+        if (!searchTerm) return DUMMY_PRODUCTS;
 
-    const {
-        searchTerm,
-        filteredProducts,
-        setSearchTerm,
-    } = useProductSearch(DUMMY_PRODUCTS);
+        // Normaliza y quita acentos de la búsqueda
+        const normalizedSearch = searchTerm
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, ''); 
 
-    // Efecto para manejar cambio de usuario
+        return DUMMY_PRODUCTS.filter(p => {
+            const normalizedName = p.name
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, ''); 
+            return normalizedName.includes(normalizedSearch);
+        });
+    }, [searchTerm]);
+
+    // CALCULAR EL TOTAL DE LA VENTA 
+    const saleTotal = useMemo(() => 
+        saleItems.reduce((acc, item) => acc + item.subtotal, 0),
+        [saleItems]
+    );
+
+    // ------------------------------------------------------------
+    // EFECTOS (Persistencia de Estado)
+    // ------------------------------------------------------------
+    
     useEffect(() => {
-        console.log(`POS cargado para usuario: ${userId}`);
-    }, [userId]);
+        localStorage.setItem(STORAGE_KEYS.SALE_ACTIVE, JSON.stringify(isSaleActive));
+    }, [isSaleActive]);
+
+    useEffect(() => {
+        if (currentSaleId !== null) {
+            localStorage.setItem(STORAGE_KEYS.SALE_ID, JSON.stringify(currentSaleId));
+        } else {
+            localStorage.removeItem(STORAGE_KEYS.SALE_ID);
+        }
+    }, [currentSaleId]);
 
     // ------------------------------------------------------------
-    // MANEJADORES DE EVENTOS
+    // Lógica del Estado y Modales
     // ------------------------------------------------------------
-    const handleStartNewSale = () => {
-        openInitialAmountModal();
+
+    const startNewSale = () => {
+        setIsInitialAmountModalOpen(true);
     };
 
     const handleInitialAmountSubmit = (amount: number) => {
-        submitInitialAmount(amount);
-        startNewSale();
-        clearCart();
-        startNewOrder();
+        setInitialCashAmount(amount); 
+        setIsInitialAmountModalOpen(false); 
+
+        if (currentSaleId === null) {
+            setCurrentSaleId(Math.floor(Date.now() / 1000)); 
+        }
+        setIsSaleActive(true);
+        setCheckoutStage('cart'); 
+        setSaleItems([]); 
+        setPayments([]); 
     };
     
-    const handleEndSaleSession = () => {
-        openClosingAmountModal();
+    const endSaleSession = () => {
+        setIsClosingAmountModalOpen(true);
     };
 
     const handleClosingAmountSubmit = (amount: number) => {
-        console.log(`Sesión de Venta ${currentSaleId} cerrada. Final: $${amount}.`);
-        submitClosingAmount(amount);
-        endSaleSession();
-        resetSession();
+        setClosingCashAmount(amount); 
+        setIsClosingAmountModalOpen(false); 
+
+        console.log(`Sesión de Venta ${currentSaleId} cerrada. Inicial: $${initialCashAmount}. Final: $${amount}.`);
+
+        localStorage.removeItem(STORAGE_KEYS.SALE_ACTIVE);
+        localStorage.removeItem(STORAGE_KEYS.SALE_ID);
+        
+        setCurrentSaleId(null);
+        setInitialCashAmount(null);
+        setClosingCashAmount(null);
+        setIsSaleActive(false);
+        setCheckoutStage('cart'); 
     };
 
+    // ------------------------------------------------------------
+    // Lógica del Carrito (Detalle de Venta)
+    // ------------------------------------------------------------
+
+    const addItemToSale = (product: typeof DUMMY_PRODUCTS[0], quantity: number = 1) => {
+        const existingItemIndex = saleItems.findIndex(item => item.id === product.id);
+
+        if (existingItemIndex > -1) {
+            // Si ya existe, actualiza la cantidad
+            setSaleItems(current => current.map((item, index) => {
+                if (index === existingItemIndex) {
+                    const newQuantity = item.quantity + quantity;
+                    return {
+                        ...item,
+                        quantity: newQuantity,
+                        subtotal: newQuantity * item.unitPrice,
+                    };
+                }
+                return item;
+            }));
+        } else {
+            // Si no existe, agrégalo
+            setSaleItems(current => [
+                ...current,
+                {
+                    id: product.id,
+                    name: product.name,
+                    quantity: quantity,
+                    unitPrice: product.unitPrice,
+                    subtotal: quantity * product.unitPrice,
+                }
+            ]);
+        }
+    };
+    
+    const updateItemQuantity = (id: number, newQuantity: number) => {
+        setSaleItems(current => current.map(item => {
+            if (item.id === id) {
+                const updatedQuantity = Math.max(1, newQuantity); 
+                return {
+                    ...item,
+                    quantity: updatedQuantity,
+                    subtotal: updatedQuantity * item.unitPrice,
+                };
+            }
+            return item;
+        }).filter(item => item.quantity > 0)); 
+    };
+
+    const removeItem = (id: number) => {
+        setSaleItems(current => current.filter(item => item.id !== id));
+    };
+
+    // ------------------------------------------------------------
+    // Lógica del Flujo de Pago 
+    // ------------------------------------------------------------
+    
     const handleStartPayment = () => {
-        startPayment(saleItems.length > 0);
+        if (saleItems.length === 0) {
+            alert('Agrega al menos un artículo para pagar.');
+            return;
+        }
+        setCheckoutStage('payment');
     };
 
     const handlePaymentComplete = (paidPayments: Payment[]) => {
-        completePayment(paidPayments, saleTotal);
+        const totalPaid = paidPayments.reduce((sum, p) => sum + p.amount, 0);
+        const calculatedChange = totalPaid - saleTotal;
+
+        setPayments(paidPayments);
+        setChangeDue(calculatedChange);
+        setCheckoutStage('confirmation');
     };
 
     const handleNewOrder = () => {
-        startNewOrder();
-        clearCart();
+        setSaleItems([]);
+        setPayments([]);
+        setChangeDue(0);
+        setCheckoutStage('cart');
     };
 
     // ------------------------------------------------------------
@@ -239,11 +370,20 @@ export default function POS() {
     // 1. VISTA INICIAL (Pantalla de "Iniciar caja") 
     if (!isSaleActive) {
         return (
-            <Container size="xl"> 
-                <Title order={1} mb="md">Punto de Venta (POS)</Title>
+            <Container size="xl"> {/* Mismo Container que Attributes */}
+                {/* CABECERA CON ESTILO DE ATTRIBUTES */}
+                <Paper withBorder p="md" mb="md" shadow="xs" style={{ flexShrink: 0 }}>
+                    <Group justify="space-between">
+                        <div>
+                            <Title order={3}>Punto de Venta (POS)</Title>
+                            <Text c="dimmed" size="sm">Terminal de venta para registro de transacciones</Text>
+                        </div>
+                    </Group>
+                </Paper>
+
+                {/* CONTENIDO PRINCIPAL - TAMAÑO ORIGINAL */}
                 <Paper withBorder p="xl" shadow="sm">
-                    
-                    <Group justify="space-between" align="flex-start" mb="xl">
+                    <Group justify="space-between" align="flex-start">
                         <Stack>
                             <Text size="lg" fw={700}>
                                 Terminal de Venta
@@ -254,16 +394,17 @@ export default function POS() {
                         </Stack>
                         
                         <Button 
-                            onClick={handleStartNewSale} 
+                            onClick={startNewSale} 
                             size="md" 
                         >
                             Iniciar Sesión de Venta
                         </Button>
                     </Group>
                 </Paper>
+
                 <AmountModal
                     opened={isInitialAmountModalOpen}
-                    onClose={closeInitialAmountModal}
+                    onClose={() => setIsInitialAmountModalOpen(false)}
                     onSubmit={handleInitialAmountSubmit}
                     title="Apertura de caja"
                     actionLabel="Confirmar Apertura"
@@ -288,11 +429,10 @@ export default function POS() {
 
     // 3. VISTA DE TPV ACTIVO (LAYOUT PRINCIPAL)
     return (
-        <Container size="xl">
+        <Container size="xl"> {/* Mismo Container que Attributes */}
             <Box 
                 ref={posRef}
                 style={{ 
-                    position: 'relative', 
                     display: 'flex',
                     flexDirection: 'column'
                 }}
@@ -308,7 +448,7 @@ export default function POS() {
                                     size="lg" 
                                     variant="filled" 
                                     color="red" 
-                                    onClick={handleEndSaleSession}
+                                    onClick={endSaleSession}
                                 >
                                     <IconDoorExit size="1.2rem" />
                                 </ActionIcon>
@@ -318,7 +458,7 @@ export default function POS() {
                 </Paper>
 
                 {/* LAYOUT PRINCIPAL DE VENTA */}
-                <Grid grow gutter="md" style={{ flex: 1, overflow: 'hidden', minHeight: 0 }}>
+                <Grid gutter="md" style={{ flex: 1, overflow: 'hidden', minHeight: 0 }}>
                     
                     {/* LISTADO Y BÚSQUEDA DE PRODUCTOS */}
                     <Grid.Col span={8}>
@@ -328,13 +468,21 @@ export default function POS() {
                             shadow="xs" 
                             style={{ height: '400px', display: 'flex', flexDirection: 'column' }} 
                         >
-                            <Title order={4} mb="md" style={{ flexShrink: 0 }}>Productos</Title>
+                            {/* CABECERA CON ESTILO DE ATTRIBUTES */}
+                            <Group justify="space-between" mb="md" style={{ flexShrink: 0 }}>
+                                <div>
+                                    <Title order={4}>Productos Disponibles</Title>
+                                </div>
+                            </Group>
+
                             <TextInput
-                                placeholder="Buscar producto..."
+                                placeholder="Buscar producto por nombre, SKU o atributos..."
                                 mb="sm"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.currentTarget.value)}
                             />
+                            
+                            {/* CONTENEDOR DE TABLA CON SCROLL */}
                             <Box style={{ flexGrow: 1, overflowY: 'auto' }}>
                                 <Table striped withColumnBorders withRowBorders>
                                     <Table.Thead>
@@ -342,15 +490,19 @@ export default function POS() {
                                             <Table.Th>SKU</Table.Th>
                                             <Table.Th>Nombre</Table.Th>
                                             <Table.Th style={{ textAlign: 'right' }}>Precio Unitario</Table.Th>
+                                            <Table.Th style={{ textAlign: 'right' }}>Stock</Table.Th>
                                             <Table.Th style={{ textAlign: 'center' }}>Acción</Table.Th>
                                         </Table.Tr>
                                     </Table.Thead>
                                     <Table.Tbody>
                                         {filteredProducts.map((product) => (
                                             <Table.Tr key={product.id}>
-                                                <Table.Td>{product.id}</Table.Td>
+                                                <Table.Td>SKU-{product.id.toString().padStart(4, '0')}</Table.Td>
                                                 <Table.Td>{product.name}</Table.Td>
                                                 <Table.Td style={{ textAlign: 'right' }}>${product.unitPrice.toFixed(2)}</Table.Td>
+                                                <Table.Td style={{ textAlign: 'right' }}>
+                                                    {Math.floor(Math.random() * 50) + 10}
+                                                </Table.Td>
                                                 <Table.Td style={{ textAlign: 'center' }}>
                                                     <Button 
                                                         size="xs" 
@@ -368,13 +520,13 @@ export default function POS() {
                         </Paper>
                     </Grid.Col>
 
-                    {/* DETALLE DE VENTA */}
+                    {/* DETALLE DE VENTA (CARRITO) */}
                     <Grid.Col span={4}>
                         <Paper 
                             withBorder 
                             p="md" 
                             shadow="xs" 
-                            style={{ height: '400px', display: 'flex', flexDirection: 'column' }} 
+                            style={{ height: '400px', display: 'flex', flexDirection: 'column' }}
                         >
                             <Title order={4} mb="md" style={{ flexShrink: 0 }}>Detalle de Venta</Title>
                             
@@ -443,18 +595,19 @@ export default function POS() {
                     </Grid.Col>
                 </Grid>
                 
-                {/* MODALES */}
+                {/* MODAL DE CIERRE DE CAJA */}
                 <AmountModal
                     opened={isClosingAmountModalOpen}
-                    onClose={closeClosingAmountModal}
+                    onClose={() => setIsClosingAmountModalOpen(false)}
                     onSubmit={handleClosingAmountSubmit}
                     title="Cierre de caja"
                     actionLabel="Cerrar caja"
                 />
                 
+                {/* MODAL DE PAGO */}
                 <PaymentModal
                     opened={checkoutStage === 'payment'}
-                    onClose={cancelPayment}
+                    onClose={() => setCheckoutStage('cart')} 
                     totalAmount={saleTotal}
                     onPaymentComplete={handlePaymentComplete}
                 />

@@ -98,7 +98,6 @@ export const ConfirmationScreen: React.FC<ConfirmationScreenProps> = ({
                             <Button 
                                 leftSection={<IconShoppingCart size="1.2rem" />} 
                                 size="lg" 
-                                color="cyan.7" 
                                 onClick={onNewOrder}
                             >
                                 Nueva Venta

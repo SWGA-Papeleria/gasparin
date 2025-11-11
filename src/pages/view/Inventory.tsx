@@ -27,6 +27,7 @@ import {
   IconHistory,
   IconArrowUp,
   IconArrowDown,
+  IconAdjustments,
 } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 
@@ -234,17 +235,8 @@ export default function Inventory() {
     setSelectedPresentacion(null);
   };
 
-  const handleAbrirMovimientoModal = (presentacion: PresentacionProducto, tipo: 'entrada' | 'salida' = 'entrada') => {
+  const handleAbrirMovimientoModal = (presentacion: PresentacionProducto) => {
     setSelectedPresentacion(presentacion);
-    
-    // Seleccionar automáticamente el primer tipo correspondiente
-    const tipoDefault = tiposMovimiento.find(t => 
-      tipo === 'entrada' ? t.es_entrada : !t.es_entrada
-    );
-    if (tipoDefault) {
-      setTipoMovimiento(tipoDefault.id_tipo_movimiento.toString());
-    }
-    
     openMovimientoModal();
   };
 
@@ -308,24 +300,14 @@ export default function Inventory() {
         </Table.Td>
         <Table.Td>
           <Group gap="xs" justify="center">
-            <Tooltip label="Ajuste de Entrada - Para correcciones, devoluciones o diferencias" position="bottom" withArrow>
+            <Tooltip label="Corrección de Inventario" position="bottom" withArrow>
               <ActionIcon
                 variant="light"
-                color="green"
-                onClick={() => handleAbrirMovimientoModal(presentacion, 'entrada')}
+                color="orange"
+                onClick={() => handleAbrirMovimientoModal(presentacion)}
                 size="sm"
               >
-                <IconArrowUp size="1rem" />
-              </ActionIcon>
-            </Tooltip>
-            <Tooltip label="Ajuste de Salida - Para mermas, uso interno o diferencias" position="bottom" withArrow>
-              <ActionIcon
-                variant="light"
-                color="red"
-                onClick={() => handleAbrirMovimientoModal(presentacion, 'salida')}
-                size="sm"
-              >
-                <IconArrowDown size="1rem" />
+                <IconAdjustments size="1rem" />
               </ActionIcon>
             </Tooltip>
             <Tooltip label="Ver Historial de Movimientos" position="bottom" withArrow>
@@ -429,11 +411,11 @@ export default function Inventory() {
         </Box>
       </Paper>
 
-      {/* Modal para Registrar Movimiento de AJUSTE */}
+      {/* Modal para Corrección de Inventario */}
       <Modal
         opened={movimientoModalOpened}
         onClose={closeMovimientoModal}
-        title={<Title order={4}>Registrar Ajuste de Inventario</Title>}
+        title={<Title order={4}>Corrección de Inventario</Title>}
         size="md"
         centered
       >
@@ -444,7 +426,7 @@ export default function Inventory() {
             <Text fw={500}>Stock Actual: <Text span>{selectedPresentacion.stock_actual}</Text></Text>
             
             <Select
-              label="Tipo de Ajuste"
+              label="Tipo de Corrección"
               placeholder="Seleccione tipo"
               data={tiposMovimiento.map(tipo => ({
                 value: tipo.id_tipo_movimiento.toString(),
@@ -468,20 +450,13 @@ export default function Inventory() {
             />
             
             <Textarea
-              label="Motivo del Ajuste *"
+              label="Motivo de la Corrección"
               value={motivo}
               onChange={(event) => setMotivo(event.currentTarget.value)}
-              placeholder="Describa el motivo del ajuste (merma, corrección, uso interno, etc.)"
+              placeholder="Describa el motivo de la corrección de inventario"
               required
               size="md"
             />
-
-            <Paper withBorder p="sm" bg="blue.0">
-              <Text size="sm" c="blue">
-                💡 <strong>Nota:</strong> Las ventas y compras actualizan el stock automáticamente. 
-                Use este formulario solo para ajustes manuales, mermas o correcciones.
-              </Text>
-            </Paper>
             
             <Group justify="flex-end" gap="xs">
               <Button variant="subtle" onClick={closeMovimientoModal} size="md">
@@ -491,9 +466,9 @@ export default function Inventory() {
                 onClick={handleRegistrarMovimiento} 
                 disabled={!tipoMovimiento || !cantidad || !motivo.trim()}
                 size="md"
-                color="blue"
+                color="orange"
               >
-                Registrar Ajuste
+                Registrar Corrección
               </Button>
             </Group>
           </Stack>

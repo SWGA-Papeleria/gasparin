@@ -4,7 +4,7 @@ import { useState } from 'react';
 // TIPOS
 // ------------------------------------------------------------
 export interface Payment {
-    method: 'Cash' | 'Card' | 'Customer Account';
+    method: 'Cash' | 'Card' | 'Transfer';
     amount: number;
 }
 

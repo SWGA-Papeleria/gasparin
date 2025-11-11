@@ -25,12 +25,10 @@ import {
   IconEdit, 
   IconTrash, 
   IconPlus, 
-  IconHistory,
   IconArrowLeft,
   IconEye,
   IconSearch,
   IconChevronRight,
-  IconHelp
 } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import LabelWithTooltip from '../../components/LabelWithTooltip'; 
@@ -50,17 +48,7 @@ interface PresentacionProducto {
   factor_conversion: number;
   precio_venta: number;
   unidad_nombre?: string;
-  stock_actual?: number;
   producto_nombre?: string;
-}
-
-interface MovimientoStock {
-  id_stock: number;
-  fk_presentacion_producto: number;
-  cantidad: number;
-  fecha_movimiento: Date;
-  fk_tipo_movimiento: number;
-  tipo_nombre?: string;
 }
 
 interface AtributoProducto {
@@ -121,7 +109,6 @@ export default function Products() {
       precio_venta: 5.50,
       unidad_nombre: 'Pieza',
       producto_nombre: 'Bolígrafo',
-      stock_actual: 45
     },
     {
       id_presentacion_producto: 2,
@@ -132,7 +119,6 @@ export default function Products() {
       precio_venta: 5.50,
       unidad_nombre: 'Pieza',
       producto_nombre: 'Bolígrafo',
-      stock_actual: 32
     },
     {
       id_presentacion_producto: 3,
@@ -142,7 +128,6 @@ export default function Products() {
       factor_conversion: 1,
       precio_venta: 25.00,
       unidad_nombre: 'Pieza',
-      stock_actual: 15
     },
     {
       id_presentacion_producto: 4,
@@ -152,75 +137,7 @@ export default function Products() {
       factor_conversion: 1,
       precio_venta: 45.00,
       unidad_nombre: 'Caja',
-      stock_actual: 8
     },
-  ]);
-
-  const [movimientos] = useState<MovimientoStock[]>([
-    {
-      id_stock: 1,
-      fk_presentacion_producto: 1,
-      cantidad: 50,
-      fecha_movimiento: new Date('2024-01-15'),
-      fk_tipo_movimiento: 1,
-      tipo_nombre: 'Compra'
-    },
-    {
-      id_stock: 2,
-      fk_presentacion_producto: 1,
-      cantidad: -5,
-      fecha_movimiento: new Date('2024-01-20'),
-      fk_tipo_movimiento: 2,
-      tipo_nombre: 'Venta'
-    },
-    {
-      id_stock: 3,
-      fk_presentacion_producto: 1,
-      cantidad: -2,
-      fecha_movimiento: new Date('2024-01-25'),
-      fk_tipo_movimiento: 2,
-      tipo_nombre: 'Venta'
-    },
-    {
-      id_stock: 4,
-      fk_presentacion_producto: 2,
-      cantidad: 40,
-      fecha_movimiento: new Date('2024-01-10'),
-      fk_tipo_movimiento: 1,
-      tipo_nombre: 'Compra'
-    },
-    {
-      id_stock: 5,
-      fk_presentacion_producto: 2,
-      cantidad: -8,
-      fecha_movimiento: new Date('2024-01-18'),
-      fk_tipo_movimiento: 2,
-      tipo_nombre: 'Venta'
-    },
-    {
-      id_stock: 6,
-      fk_presentacion_producto: 3,
-      cantidad: 20,
-      fecha_movimiento: new Date('2024-01-12'),
-      fk_tipo_movimiento: 1,
-      tipo_nombre: 'Compra'
-    },
-    {
-      id_stock: 7,
-      fk_presentacion_producto: 4,
-      cantidad: 10,
-      fecha_movimiento: new Date('2024-01-08'),
-      fk_tipo_movimiento: 1,
-      tipo_nombre: 'Compra'
-    },
-    {
-      id_stock: 8,
-      fk_presentacion_producto: 4,
-      cantidad: -2,
-      fecha_movimiento: new Date('2024-01-22'),
-      fk_tipo_movimiento: 2,
-      tipo_nombre: 'Venta'
-    }
   ]);
 
   // Datos de atributos (del módulo Attributes)
@@ -259,12 +176,10 @@ export default function Products() {
   // Estados para modales
   const [productoModalOpened, { open: openProductoModal, close: closeProductoModal }] = useDisclosure(false);
   const [presentacionModalOpened, { open: openPresentacionModal, close: closePresentacionModal }] = useDisclosure(false);
-  const [historialModalOpened, { open: openHistorialModal, close: closeHistorialModal }] = useDisclosure(false);
 
   // Estados para formularios
   const [editingProduct, setEditingProduct] = useState<Producto | null>(null);
   const [editingPresentacion, setEditingPresentacion] = useState<PresentacionProducto | null>(null);
-  const [selectedPresentacion, setSelectedPresentacion] = useState<PresentacionProducto | null>(null);
   const [nombreBase, setNombreBase] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [sku, setSku] = useState('');
@@ -356,7 +271,6 @@ export default function Products() {
         factor_conversion: Number(factorConversion),
         unidad_nombre: unidades.find(u => u.id_unidad === parseInt(unidadSeleccionada))?.nombre,
         producto_nombre: selectedProduct.nombre_base,
-        stock_actual: 0
       };
 
       setPresentaciones([...presentaciones, newPresentation]);
@@ -445,31 +359,14 @@ export default function Products() {
     openPresentacionModal();
   };
 
-  const handleVerHistorial = (presentacion: PresentacionProducto) => {
-    setSelectedPresentacion(presentacion);
-    openHistorialModal();
-  };
-
   // Obtener presentaciones de un producto específico
   const getPresentacionesByProduct = (productoId: number) => {
     return presentaciones.filter(pres => pres.fk_producto === productoId);
   };
 
-  // Obtener movimientos de una presentación específica
-  const getMovimientosByPresentacion = (presentacionId: number) => {
-    return movimientos.filter(mov => mov.fk_presentacion_producto === presentacionId);
-  };
-
   // Obtener atributos de una presentación específica
   const getAtributosByPresentacion = (presentacionId: number) => {
     return atributosProducto.filter(atributo => atributo.fk_presentacion_producto === presentacionId);
-  };
-
-  const getStockStatus = (stock: number) => {
-    if (stock === 0) return { color: 'red', label: 'Sin Stock' };
-    if (stock < 10) return { color: 'orange', label: 'Bajo' };
-    if (stock < 50) return { color: 'yellow', label: 'Medio' };
-    return { color: 'green', label: 'Alto' };
   };
 
   // Formatear atributos para mostrar en la tabla (solo valores)
@@ -618,70 +515,46 @@ export default function Products() {
                     <Table.Th>Unidad</Table.Th>
                     <Table.Th style={{ textAlign: 'right' }}>Precio Venta</Table.Th>
                     <Table.Th style={{ textAlign: 'center' }}>Factor Conversión</Table.Th>
-                    <Table.Th style={{ textAlign: 'center' }}>Stock Actual</Table.Th>
-                    <Table.Th style={{ textAlign: 'center' }}>Estado</Table.Th>
                     <Table.Th>Atributos</Table.Th>
                     <Table.Th style={{ textAlign: 'center' }}>Acciones</Table.Th>
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
-                  {presentacionesDelProducto.map((presentacion) => {
-                    const stockStatus = getStockStatus(presentacion.stock_actual || 0);
-                    
-                    return (
-                      <Table.Tr key={presentacion.id_presentacion_producto}>
-                        <Table.Td>
-                          <Text>{presentacion.sku}</Text>
-                        </Table.Td>
-                        <Table.Td>
-                          <Badge variant="light">{presentacion.unidad_nombre}</Badge>
-                        </Table.Td>
-                        <Table.Td style={{ textAlign: 'right' }}>
-                          <Text>${presentacion.precio_venta.toFixed(2)}</Text>
-                        </Table.Td>
-                        <Table.Td style={{ textAlign: 'center' }}>
-                          <Text>{presentacion.factor_conversion}</Text>
-                        </Table.Td>
-                        <Table.Td style={{ textAlign: 'center' }}>
-                          <Text>{presentacion.stock_actual}</Text>
-                        </Table.Td>
-                        <Table.Td style={{ textAlign: 'center' }}>
-                          <Badge color={stockStatus.color}>
-                            {stockStatus.label}
-                          </Badge>
-                        </Table.Td>
-                        <Table.Td>
-                          <Text size="sm" lineClamp={2}>
-                            {formatAtributosForDisplay(presentacion.id_presentacion_producto)}
-                          </Text>
-                        </Table.Td>
-                        <Table.Td>
-                          <Group gap="xs" justify="center">
-                            <Tooltip label="Editar presentación" position="bottom" withArrow>
-                              <ActionIcon
-                                variant="light"
-                                color="orange"
-                                onClick={() => handleEditarPresentacion(presentacion)}
-                                size="sm"
-                              >
-                                <IconEdit size="1rem" />
-                              </ActionIcon>
-                            </Tooltip>
-                            <Tooltip label="Ver historial" position="bottom" withArrow>
-                              <ActionIcon
-                                variant="light"
-                                color="blue"
-                                onClick={() => handleVerHistorial(presentacion)}
-                                size="sm"
-                              >
-                                <IconHistory size="1rem" />
-                              </ActionIcon>
-                            </Tooltip>
-                          </Group>
-                        </Table.Td>
-                      </Table.Tr>
-                    );
-                  })}
+                  {presentacionesDelProducto.map((presentacion) => (
+                    <Table.Tr key={presentacion.id_presentacion_producto}>
+                      <Table.Td>
+                        <Text>{presentacion.sku}</Text>
+                      </Table.Td>
+                      <Table.Td>
+                        <Badge variant="light">{presentacion.unidad_nombre}</Badge>
+                      </Table.Td>
+                      <Table.Td style={{ textAlign: 'right' }}>
+                        <Text>${presentacion.precio_venta.toFixed(2)}</Text>
+                      </Table.Td>
+                      <Table.Td style={{ textAlign: 'center' }}>
+                        <Text>{presentacion.factor_conversion}</Text>
+                      </Table.Td>
+                      <Table.Td>
+                        <Text size="sm" lineClamp={2}>
+                          {formatAtributosForDisplay(presentacion.id_presentacion_producto)}
+                        </Text>
+                      </Table.Td>
+                      <Table.Td>
+                        <Group gap="xs" justify="center">
+                          <Tooltip label="Editar presentación" position="bottom" withArrow>
+                            <ActionIcon
+                              variant="light"
+                              color="orange"
+                              onClick={() => handleEditarPresentacion(presentacion)}
+                              size="sm"
+                            >
+                              <IconEdit size="1rem" />
+                            </ActionIcon>
+                          </Tooltip>
+                        </Group>
+                      </Table.Td>
+                    </Table.Tr>
+                  ))}
                 </Table.Tbody>
               </Table>
             </Box>
@@ -870,7 +743,7 @@ export default function Products() {
               placeholder="1"
               min={1}
               step={1}
-              required // ← Ahora usas el required nativo de Mantine
+              required
               size="md"
               allowDecimal={false}
             />
@@ -993,84 +866,6 @@ export default function Products() {
             </Button>
           </Group>
         </Stack>
-      </Modal>
-
-      {/* Modal para Historial de Movimientos */}
-      <Modal
-        opened={historialModalOpened}
-        onClose={closeHistorialModal}
-        title={
-          <Title order={4}>
-            {`Historial de Movimientos: ${selectedPresentacion?.sku}`}
-          </Title>
-        }
-        size="lg"
-        centered
-      >
-        {selectedPresentacion && (
-          <Stack gap="md">
-            <Group justify="space-between">
-              <Text fw={500}>Producto: <Text span>
-                {productos.find(p => p.id_producto === selectedPresentacion.fk_producto)?.nombre_base}
-              </Text></Text>
-              <Text fw={500}>Stock Actual: <Text span>{selectedPresentacion.stock_actual}</Text></Text>
-            </Group>
-            
-            {getMovimientosByPresentacion(selectedPresentacion.id_presentacion_producto).length === 0 ? (
-              <Text c="dimmed" ta="center" py="xl">
-                No hay movimientos para esta presentación
-              </Text>
-            ) : (
-              <Box style={{ height: '400px', overflowY: 'auto' }}>
-                <Table>
-                  <Table.Thead>
-                    <Table.Tr>
-                      <Table.Th>Fecha</Table.Th>
-                      <Table.Th>Tipo</Table.Th>
-                      <Table.Th style={{ textAlign: 'right' }}>Cantidad</Table.Th>
-                      <Table.Th style={{ textAlign: 'right' }}>Saldo</Table.Th>
-                    </Table.Tr>
-                  </Table.Thead>
-                  <Table.Tbody>
-                    {getMovimientosByPresentacion(selectedPresentacion.id_presentacion_producto)
-                      .sort((a, b) => new Date(a.fecha_movimiento).getTime() - new Date(b.fecha_movimiento).getTime())
-                      .map((movimiento, index, array) => {
-                        // Calcular saldo acumulado
-                        const saldoAcumulado = array
-                          .slice(0, index + 1)
-                          .reduce((sum, mov) => sum + mov.cantidad, 0);
-                        
-                        return (
-                          <Table.Tr key={movimiento.id_stock}>
-                            <Table.Td>
-                              <Text size="sm">
-                                {movimiento.fecha_movimiento.toLocaleDateString()}
-                              </Text>
-                            </Table.Td>
-                            <Table.Td>
-                              <Badge variant="light" color={movimiento.cantidad > 0 ? 'green' : 'red'}>
-                                {movimiento.tipo_nombre}
-                              </Badge>
-                            </Table.Td>
-                            <Table.Td style={{ textAlign: 'right' }}>
-                              <Text color={movimiento.cantidad > 0 ? 'green' : 'red'}>
-                                {movimiento.cantidad > 0 ? '+' : ''}{movimiento.cantidad}
-                              </Text>
-                            </Table.Td>
-                            <Table.Td style={{ textAlign: 'right' }}>
-                              <Text>
-                                {saldoAcumulado}
-                              </Text>
-                            </Table.Td>
-                          </Table.Tr>
-                        );
-                      })}
-                  </Table.Tbody>
-                </Table>
-              </Box>
-            )}
-          </Stack>
-        )}
       </Modal>
     </Container>
   );

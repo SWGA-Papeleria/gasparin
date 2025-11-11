@@ -29,9 +29,6 @@ export default function UnitOfMeasure() {
     { id_unidad: 2, nombre: 'Paquete' },
     { id_unidad: 3, nombre: 'Caja' },
     { id_unidad: 4, nombre: 'Metro' },
-    { id_unidad: 5, nombre: 'Litro' },
-    { id_unidad: 6, nombre: 'Kilogramo' },
-    { id_unidad: 7, nombre: 'Gramo' },
   ]);
 
   // Estado para búsqueda
