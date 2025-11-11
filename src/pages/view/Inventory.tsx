@@ -52,6 +52,7 @@ interface MovimientoStock {
   fk_tipo_movimiento: number;
   tipo_nombre?: string;
   motivo?: string;
+  realizado_por?: string; // <- CAMPO AÑADIDO
 }
 
 interface TipoMovimiento {
@@ -127,7 +128,8 @@ export default function Inventory() {
       fecha_movimiento: new Date('2024-01-15'),
       fk_tipo_movimiento: 1,
       tipo_nombre: 'Ajuste de Inventario',
-      motivo: 'Ajuste inicial de stock'
+      motivo: 'Ajuste inicial de stock',
+      realizado_por: 'Ana García' // <- DATO AÑADIDO
     },
     {
       id_stock: 2,
@@ -136,7 +138,8 @@ export default function Inventory() {
       fecha_movimiento: new Date('2024-01-16'),
       fk_tipo_movimiento: 2,
       tipo_nombre: 'Merma/Pérdida',
-      motivo: 'Productos dañados en almacén'
+      motivo: 'Productos dañados en almacén',
+      realizado_por: 'Carlos López' // <- DATO AÑADIDO
     },
     {
       id_stock: 3,
@@ -145,7 +148,8 @@ export default function Inventory() {
       fecha_movimiento: new Date('2024-01-10'),
       fk_tipo_movimiento: 1,
       tipo_nombre: 'Ajuste de Inventario',
-      motivo: 'Corrección por diferencia en conteo'
+      motivo: 'Corrección por diferencia en conteo',
+      realizado_por: 'María Rodríguez' // <- DATO AÑADIDO
     },
     {
       id_stock: 4,
@@ -154,7 +158,8 @@ export default function Inventory() {
       fecha_movimiento: new Date('2024-01-12'),
       fk_tipo_movimiento: 4,
       tipo_nombre: 'Uso Interno',
-      motivo: 'Uso en oficina'
+      motivo: 'Uso en oficina',
+      realizado_por: 'Juan Pérez' // <- DATO AÑADIDO
     },
   ]);
 
@@ -210,7 +215,8 @@ export default function Inventory() {
       fecha_movimiento: new Date(),
       fk_tipo_movimiento: parseInt(tipoMovimiento),
       tipo_nombre: tipo.descripcion,
-      motivo: motivo.trim()
+      motivo: motivo.trim(),
+      realizado_por: 'Usuario Actual' // <- CAMPO AÑADIDO (puedes cambiar por el usuario real)
     };
 
     // Actualizar movimientos
@@ -508,6 +514,7 @@ export default function Inventory() {
                       <Table.Th>Motivo</Table.Th>
                       <Table.Th style={{ textAlign: 'right' }}>Cantidad</Table.Th>
                       <Table.Th style={{ textAlign: 'right' }}>Saldo</Table.Th>
+                      <Table.Th>Realizado por</Table.Th> {/* <- NUEVA COLUMNA AÑADIDA */}
                     </Table.Tr>
                   </Table.Thead>
                   <Table.Tbody>
@@ -540,6 +547,11 @@ export default function Inventory() {
                         <Table.Td style={{ textAlign: 'right' }}>
                           <Text>
                             {movimiento.stock_acumulado}
+                          </Text>
+                        </Table.Td>
+                        <Table.Td> {/* <- NUEVA CELDA AÑADIDA */}
+                          <Text size="sm">
+                            {movimiento.realizado_por || 'Sistema'}
                           </Text>
                         </Table.Td>
                       </Table.Tr>
