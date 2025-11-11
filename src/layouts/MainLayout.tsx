@@ -81,7 +81,7 @@ interface LinksGroupProps extends LinkData {
 const linksData: LinkData[] = [
     { 
         icon: IconClockHour7, 
-        label: 'Dashboard', 
+        label: 'Panel de métricas', 
         to: '', 
         roles: ['Superusuario', 'Administrador', 'Empleado'] 
     }, 

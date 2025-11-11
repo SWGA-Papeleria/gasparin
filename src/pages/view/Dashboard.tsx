@@ -175,7 +175,7 @@ export default function Dashboard() {
   return (
     <Container size="xl" py="md">
       <Title order={1} mb="md">
-        Panel de Control Principal
+        Panel de Métricas Principal
       </Title>
       <Text c="dimmed" mb="xl">
         Resumen y métricas clave del negocio
