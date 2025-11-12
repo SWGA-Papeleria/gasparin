@@ -150,9 +150,9 @@ export default function Customers() {
               variant="light"
               color="blue"
               onClick={() => handleView(customer)}
-              size="md"
+              size="sm"
             >
-              <IconEye size="1.1rem" />
+              <IconEye size="1rem" />
             </ActionIcon>
           </Tooltip>
           <Tooltip label="Editar cliente" position="bottom" withArrow>
@@ -160,9 +160,9 @@ export default function Customers() {
               variant="light"
               color="orange"
               onClick={() => handleEdit(customer)}
-              size="md"
+              size="sm"
             >
-              <IconEdit size="1.1rem" />
+              <IconEdit size="1rem" />
             </ActionIcon>
           </Tooltip>
           <Tooltip label="Eliminar cliente" position="bottom" withArrow>
@@ -170,9 +170,9 @@ export default function Customers() {
               variant="light"
               color="red"
               onClick={() => handleDelete(customer.id_cliente)}
-              size="md"
+              size="sm"
             >
-              <IconTrash size="1.2rem" />
+              <IconTrash size="1rem" />
             </ActionIcon>
           </Tooltip>
         </Group>

@@ -157,9 +157,9 @@ export default function Suppliers() {
               variant="light"
               color="blue"
               onClick={() => handleView(supplier)}
-              size="md"
+              size="sm"
             >
-              <IconEye size="1.1rem" />
+              <IconEye size="1rem" />
             </ActionIcon>
           </Tooltip>
           <Tooltip label="Editar proveedor" position="bottom" withArrow>
@@ -167,9 +167,9 @@ export default function Suppliers() {
               variant="light"
               color="orange"
               onClick={() => handleEdit(supplier)}
-              size="md"
+              size="sm"
             >
-              <IconEdit size="1.1rem" />
+              <IconEdit size="1rem" />
             </ActionIcon>
           </Tooltip>
           <Tooltip label="Eliminar proveedor" position="bottom" withArrow>
@@ -177,9 +177,9 @@ export default function Suppliers() {
               variant="light"
               color="red"
               onClick={() => handleDelete(supplier.id_proveedor)}
-              size="md"
+              size="sm"
             >
-              <IconTrash size="1.2rem" />
+              <IconTrash size="1rem" />
             </ActionIcon>
           </Tooltip>
         </Group>

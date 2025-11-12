@@ -498,7 +498,7 @@ export default function Orders() {
       <Modal
         opened={viewModal}
         onClose={closeViewModal}
-        title={`Detalles del Pedido - ${pedidoSeleccionado?.folio}`}
+        title={<Title order={4}>Detalles del Pedido {pedidoSeleccionado?.folio}</Title>}
         size="lg"
         centered
       >

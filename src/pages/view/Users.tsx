@@ -259,9 +259,9 @@ export default function Users() {
               variant="light"
               color="blue"
               onClick={() => handleView(user)}
-              size="md"
+              size="sm"
             >
-              <IconEye size="1.1rem" />
+              <IconEye size="1rem" />
             </ActionIcon>
           </Tooltip>
           <Tooltip label="Editar usuario" position="bottom" withArrow>
@@ -269,9 +269,9 @@ export default function Users() {
               variant="light"
               color="orange"
               onClick={() => handleEdit(user)}
-              size="md"
+              size="sm"
             >
-              <IconEdit size="1.1rem" />
+              <IconEdit size="1rem" />
             </ActionIcon>
           </Tooltip>
           <Tooltip label="Eliminar usuario" position="bottom" withArrow>
@@ -279,9 +279,9 @@ export default function Users() {
               variant="light"
               color="red"
               onClick={() => handleDelete(user.id_usuario)}
-              size="md"
+              size="sm"
             >
-              <IconTrash size="1.2rem" />
+              <IconTrash size="1rem" />
             </ActionIcon>
           </Tooltip>
         </Group>

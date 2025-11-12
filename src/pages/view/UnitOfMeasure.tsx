@@ -37,6 +37,11 @@ export default function UnitOfMeasure() {
   const [opened, { open, close }] = useDisclosure(false);
   const [editingUnit, setEditingUnit] = useState<UnitOfMeasure | null>(null);
   const [unitName, setUnitName] = useState('');
+  
+  // NUEVOS ESTADOS para el Modal de Confirmación de ELIMINACIÓN
+  const [deleteConfirmModalOpened, { open: openDeleteConfirmModal, close: closeDeleteConfirmModal }] = useDisclosure(false);
+  const [deletingUnit, setDeletingUnit] = useState<UnitOfMeasure | null>(null);
+
 
   // Filtrar unidades
   const filteredUnits = units.filter(unit =>
@@ -52,7 +57,7 @@ export default function UnitOfMeasure() {
       ));
     } else {
       const newUnit: UnitOfMeasure = {
-        id_unidad: Math.max(...units.map(u => u.id_unidad)) + 1,
+        id_unidad: Math.max(...units.map(u => u.id_unidad), 0) + 1, // Arreglo el cálculo de ID por si está vacía
         nombre: unitName,
       };
       setUnits([...units, newUnit]);
@@ -68,16 +73,29 @@ export default function UnitOfMeasure() {
     open();
   };
 
-  const handleDelete = (id: number) => {
-    setUnits(units.filter(unit => unit.id_unidad !== id));
+  // Manejar eliminar unidad (MODIFICADO: Usa modal en lugar de window.confirm)
+  const handleDelete = (unit: UnitOfMeasure) => {
+     setDeletingUnit(unit);
+     openDeleteConfirmModal();
   };
+
+  // Nuevo: Confirma la eliminación
+  const confirmDeleteUnit = () => {
+    if (deletingUnit) {
+        setUnits(units.filter(u => u.id_unidad !== deletingUnit.id_unidad));
+    }
+    closeDeleteConfirmModal();
+    setDeletingUnit(null);
+  };
+
 
   const rows = filteredUnits.map((unit) => (
     <Table.Tr key={unit.id_unidad}>
       <Table.Td>
         <Text>{unit.nombre}</Text>
       </Table.Td>
-      <Table.Td>
+      {/* Columna de Acciones con ancho fijo: 150px */}
+      <Table.Td style={{ width: 150, textAlign: 'center' }}>
         <Group gap="xs" justify="center">
           <Tooltip label="Editar unidad" position="bottom" withArrow>
             <ActionIcon
@@ -93,10 +111,10 @@ export default function UnitOfMeasure() {
             <ActionIcon
               variant="light"
               color="red"
-              onClick={() => handleDelete(unit.id_unidad)}
+              onClick={() => handleDelete(unit)} // MODIFICADO: Llama a handleDelete con el objeto
               size="sm"
             >
-              <IconTrash size="1.2rem" />
+              <IconTrash size="1rem" />
             </ActionIcon>
           </Tooltip>
         </Group>
@@ -156,8 +174,8 @@ export default function UnitOfMeasure() {
           <Table striped withColumnBorders withRowBorders>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th>Unidad de Medida</Table.Th>
-                <Table.Th style={{ textAlign: 'center' }}>Acciones</Table.Th>
+                <Table.Th style={{ width: 'auto' }}>Unidad de Medida</Table.Th> {/* Columna de contenido, toma el espacio restante */}
+                <Table.Th style={{ width: 150, textAlign: 'center' }}>Acciones</Table.Th> {/* Columna fija: 150px */}
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
@@ -177,7 +195,7 @@ export default function UnitOfMeasure() {
         </Box>
       </Paper>
 
-      {/* MODAL - Estilo POS */}
+      {/* MODAL (EDICIÓN/CREACIÓN) */}
       <Modal
         opened={opened}
         onClose={close}
@@ -188,6 +206,7 @@ export default function UnitOfMeasure() {
         }
         size="md"
         centered
+        closeOnClickOutside={false} // AÑADIDO: No se cierra al hacer click fuera
       >
         <Stack>
           <TextInput
@@ -206,6 +225,27 @@ export default function UnitOfMeasure() {
             </Button>
           </Group>
         </Stack>
+      </Modal>
+      
+      {/* NUEVO: MODAL DE CONFIRMACIÓN PARA ELIMINACIÓN */}
+      <Modal
+        opened={deleteConfirmModalOpened}
+        onClose={closeDeleteConfirmModal}
+        title={<Title order={4} c="red">Confirmar Eliminación</Title>}
+        centered
+        size="sm"
+        closeOnClickOutside={false} // AÑADIDO
+      >
+        <Text>¿Estás seguro de que deseas eliminar la unidad de medida {deletingUnit?.nombre}?</Text>
+        <Text c="dimmed" size="sm" mt="xs">Esta acción es irreversible.</Text>
+        <Group justify="flex-end" gap="xs" mt="md">
+            <Button variant="subtle" onClick={closeDeleteConfirmModal}>
+                Cancelar
+            </Button>
+            <Button onClick={confirmDeleteUnit} color="red">
+                Eliminar
+            </Button>
+        </Group>
       </Modal>
     </Container>
   );

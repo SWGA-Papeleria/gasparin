@@ -35,6 +35,7 @@ import {
   IconCash,
   IconShoppingCart,
   IconInfoCircle,
+  IconX,
 } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { useAuth } from '../../context/AuthContext';
@@ -473,19 +474,19 @@ export default function Sales() {
         ${venta.total.toFixed(2)}
       </Table.Td>
       <Table.Td style={{ textAlign: 'center' }}>
-        <Group gap='{1}' justify="center">
+        <Group gap='xs' justify="center">
           <Tooltip label="Ver detalles" position="bottom" withArrow>
-            <ActionIcon variant="light" color="blue" onClick={() => handleViewDetails(venta)}>
+            <ActionIcon variant="light" color="blue" onClick={() => handleViewDetails(venta)} size="sm">
               <IconEye size="1rem" />
             </ActionIcon>
           </Tooltip>
           <Tooltip label="Cambiar estado" position="bottom" withArrow>
-            <ActionIcon variant="light" color="orange" onClick={() => handleChangeStatus(venta)}>
+            <ActionIcon variant="light" color="orange" onClick={() => handleChangeStatus(venta)} size="sm">
               <IconEdit size="1rem" />
             </ActionIcon>
           </Tooltip>
           <Tooltip label="Descargar recibo" position="bottom" withArrow>
-            <ActionIcon variant="light" color="green">
+            <ActionIcon variant="light" color="green" size="sm">
               <IconDownload size="1rem" />
             </ActionIcon>
           </Tooltip>
@@ -791,16 +792,32 @@ export default function Sales() {
                             </Box>
                             
                             <Group>
-                              <Tooltip label="Seleccionar para devolución">
+                              {/* BOTÓN MEJORADO CON TOOLTIP DINÁMICO E ÍCONO CAMBIANTE */}
+                              {producto.devolver ? (
                                 <ActionIcon
-                                  color={producto.devolver ? "blue" : "gray"}
-                                  variant={producto.devolver ? "filled" : "outline"}
+                                  color="red"
+                                  variant="filled"
                                   onClick={() => handleProductoDevolucionChange(index, 'devolver', !producto.devolver)}
                                 >
-                                  <IconShoppingCart size="1rem" />
+                                  <IconX size="1rem" />
                                 </ActionIcon>
-                              </Tooltip>
-                              
+                              ) : (
+                                // Con tooltip cuando no está seleccionado (IconShoppingCart)
+                                <Tooltip 
+                                  label="Seleccionar para devolución" 
+                                  position="bottom" 
+                                  withArrow
+                                >
+                                  <ActionIcon
+                                    color="blue"
+                                    variant="outline"
+                                    onClick={() => handleProductoDevolucionChange(index, 'devolver', !producto.devolver)}
+                                  >
+                                    <IconShoppingCart size="1rem" />
+                                  </ActionIcon>
+                                </Tooltip>
+                              )}
+                                                            
                               {producto.devolver && (
                                 <NumberInput
                                   placeholder="Cantidad"

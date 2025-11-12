@@ -214,14 +214,14 @@ export default function Purchases() {
         <Text>${compra.costo_total.toFixed(2)}</Text>
       </Table.Td>
       <Table.Td style={{ textAlign: 'center' }}>
-        <Group gap='{1}' justify="center">
+        <Group gap='xs' justify="center">
           <Tooltip label="Ver detalles" position="bottom" withArrow>
-            <ActionIcon variant="light" color="blue" onClick={() => handleViewDetails(compra)}>
+            <ActionIcon variant="light" color="blue" onClick={() => handleViewDetails(compra)} size="sm">
               <IconEye size="1rem" />
             </ActionIcon>
           </Tooltip>
           <Tooltip label="Descargar PDF" position="bottom" withArrow>
-            <ActionIcon variant="light" color="green">
+            <ActionIcon variant="light" color="green" size="sm">
               <IconDownload size="1rem" />
             </ActionIcon>
           </Tooltip>
