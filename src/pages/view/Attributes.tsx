@@ -1,4 +1,4 @@
-// pages/view/Attributes.tsx
+// pages/view/Attributes.tsx hola
 import { useState, useMemo } from 'react';
 import {
   Table,
