@@ -1,4 +1,4 @@
-import { FilterParams, DashboardMetrics } from '../types/dashboard.types';
+import type { FilterParams, DashboardMetrics } from '../types/dashboard.types';
 
 export const dashboardService = {
   async getMetrics(params: FilterParams): Promise<DashboardMetrics> {
