@@ -1,6 +1,6 @@
 import type { Brand, BrandFormData } from '../types/brand.types';
 
-// Mock data para desarrollo - temporal
+// Datos simulados para desarrollo - temporal
 const mockBrands: Brand[] = [
   { id_brand: 1, name: 'BIC' },
   { id_brand: 2, name: 'Norma' },
@@ -12,7 +12,7 @@ const mockBrands: Brand[] = [
 export class BrandService {
   private brands: Brand[] = [...mockBrands];
 
-  // CRUD Operations
+  // Operaciones CRUD
   async getAll(): Promise<Brand[]> {
     // Simular delay de API
     return new Promise(resolve => {
@@ -56,13 +56,13 @@ export class BrandService {
   // Validaciones
   validateName(name: string, currentId?: number): string | null {
     if (!name.trim()) {
-      return 'Brand name is required';
+      return 'El nombre de la marca es requerido';
     }
     if (name.trim().length < 2) {
-      return 'Name must be at least 2 characters';
+      return 'El nombre debe tener al menos 2 caracteres';
     }
     if (name.trim().length > 50) {
-      return 'Name cannot exceed 50 characters';
+      return 'El nombre no puede exceder 50 caracteres';
     }
     
     const normalizedName = name.trim().toLowerCase();
@@ -72,7 +72,7 @@ export class BrandService {
     );
     
     if (existingBrand) {
-      return 'A brand with this name already exists';
+      return 'Ya existe una marca con este nombre';
     }
     
     return null;

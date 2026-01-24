@@ -1,17 +1,17 @@
 import type { UnitOfMeasure, UnitOfMeasureFormData } from '../types/unit-of-measure.types';
 
-// Mock data para desarrollo - temporal
+// Datos simulados para desarrollo - temporal
 const mockUnits: UnitOfMeasure[] = [
-  { id_unit: 1, name: 'Piece' },
-  { id_unit: 2, name: 'Package' },
-  { id_unit: 3, name: 'Box' },
-  { id_unit: 4, name: 'Meter' },
+  { id_unit: 1, name: 'Pieza' },
+  { id_unit: 2, name: 'Paquete' },
+  { id_unit: 3, name: 'Caja' },
+  { id_unit: 4, name: 'Metro' },
 ];
 
 export class UnitOfMeasureService {
   private units: UnitOfMeasure[] = [...mockUnits];
 
-  // CRUD Operations
+  // Operaciones CRUD
   async getAll(): Promise<UnitOfMeasure[]> {
     // Simular delay de API
     return new Promise(resolve => {
@@ -55,13 +55,13 @@ export class UnitOfMeasureService {
   // Validaciones
   validateName(name: string, currentId?: number): string | null {
     if (!name.trim()) {
-      return 'Unit name is required';
+      return 'El nombre de la unidad es requerido';
     }
     if (name.trim().length < 2) {
-      return 'Name must be at least 2 characters';
+      return 'El nombre debe tener al menos 2 caracteres';
     }
     if (name.trim().length > 50) {
-      return 'Name cannot exceed 50 characters';
+      return 'El nombre no puede exceder 50 caracteres';
     }
     
     const normalizedName = name.trim().toLowerCase();
@@ -71,7 +71,7 @@ export class UnitOfMeasureService {
     );
     
     if (existingUnit) {
-      return 'A unit with this name already exists';
+      return 'Ya existe una unidad con este nombre';
     }
     
     return null;

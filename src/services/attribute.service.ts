@@ -1,31 +1,32 @@
 import type { Attribute, AttributeValue, AttributeFormData } from '../types/attribute.types';
 
-// Mock data para desarrollo - temporal
+// Datos simulados para desarrollo - temporal
 const mockAttributes: Attribute[] = [
   {
     id_attribute: 1,
     name: 'Color',
     values: [
-      { id_value: 1, value: 'Red' },
-      { id_value: 2, value: 'Blue' },
-      { id_value: 3, value: 'Green' },
+      { id_value: 1, value: 'Rojo' },
+      { id_value: 2, value: 'Azul' },
+      { id_value: 3, value: 'Verde' },
     ]
   },
   {
     id_attribute: 2,
-    name: 'Size',
+    name: 'Tamaño',
     values: [
-      { id_value: 4, value: 'S' },
+      { id_value: 4, value: 'G' },
       { id_value: 5, value: 'M' },
-      { id_value: 6, value: 'L' },
+      { id_value: 6, value: 'P' },
     ]
   },
   {
     id_attribute: 3,
     name: 'Material',
     values: [
-      { id_value: 7, value: 'Cotton' },
-      { id_value: 8, value: 'Polyester' },
+      { id_value: 7, value: 'Algodón' },
+      { id_value: 8, value: 'Poliéster' },
+      { id_value: 9, value: 'Lana' },
     ]
   },
 ];
@@ -39,7 +40,7 @@ export class AttributeService {
     return this.tempIdCounter--;
   }
 
-  // CRUD Operations
+  // Operaciones CRUD
   async getAll(): Promise<Attribute[]> {
     return new Promise(resolve => {
       setTimeout(() => resolve([...this.attributes]), 300);
@@ -104,13 +105,13 @@ export class AttributeService {
   // Validaciones
   validateName(name: string, currentId?: number): string | null {
     if (!name.trim()) {
-      return 'Attribute name is required';
+      return 'El nombre del atributo es requerido';
     }
     if (name.trim().length < 3) {
-      return 'Name must be at least 3 characters';
+      return 'El nombre debe tener al menos 3 caracteres';
     }
     if (name.trim().length > 50) {
-      return 'Name cannot exceed 50 characters';
+      return 'El nombre no puede exceder 50 caracteres';
     }
     
     const normalizedName = name.trim().toLowerCase();
@@ -120,7 +121,7 @@ export class AttributeService {
     );
     
     if (existingAttribute) {
-      return 'An attribute with this name already exists';
+      return 'Ya existe un atributo con este nombre';
     }
     
     return null;
@@ -128,7 +129,7 @@ export class AttributeService {
 
   validateValue(value: string, currentValues: AttributeValue[], currentValueId?: number): string | null {
     if (!value.trim()) {
-      return 'Value cannot be empty';
+      return 'El valor no puede estar vacío';
     }
     
     const normalizedValue = value.trim().toLowerCase();
@@ -138,7 +139,7 @@ export class AttributeService {
     );
     
     if (existingValue) {
-      return 'This value already exists';
+      return 'Este valor ya existe';
     }
     
     return null;
