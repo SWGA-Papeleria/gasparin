@@ -49,7 +49,7 @@ import OrderCreateEdit from '../../pages/OrderCreateEdit';
 import Reports from '../../pages/Reports';
 import Customers from '../../pages/Customers';
 import Suppliers from '../../pages/Suppliers';
-import Users from '../../pages/view/Users';
+import Users from '../../pages/Users';
 import UnitOfMeasure from '../../pages/UnitOfMeasure';
 import Attributes from '../../pages/Attributes';
 import Brand from '../../pages/Brand';
