@@ -1,8 +1,8 @@
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
-import Dashboard from './pages/view/Dashboard';
-import ProtectedRoute from './components/ProtectedRoute'; // Importar el componente de protección
-import MainLayout from './layouts/MainLayout';
+import LoginPage from './pages/Login';
+import ProtectedRoute from './components/auth/ProtectedRoute'; // Importar el componente de protección
+import MainLayout from './components/layout/MainLayout';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
@@ -22,6 +22,9 @@ function App() {
         />      
         {/* Redirecciona la ruta raíz: si está autenticado, ir a dashboard, si no, a login */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+        {/* RUTA COMODÍN GLOBAL - Captura TODAS las rutas no definidas */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </HashRouter>
   );
