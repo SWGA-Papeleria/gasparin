@@ -18,6 +18,7 @@ import { useMediaQuery } from '@mantine/hooks';
 import { useState, useEffect } from 'react';
 import { useNavigate, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import NotFound from '../../pages/NotFound';
+import { APP_NAME } from '../../config/app'
 
 import {
   IconChevronRight,
@@ -106,7 +107,7 @@ export default function MainLayout() {
                 aria-label="Toggle navigation"
               />
               <Text fw={700} size="lg" c="white">
-                Papelería Gasparín
+                {APP_NAME}
               </Text>
             </Group>
           </Group>
@@ -186,7 +187,7 @@ function SidebarContent({
       <AppShell.Section>
         <Group justify="space-between">
           <Text fw={700} size="lg" c="white">
-            Papelería Gasparín
+            {APP_NAME}
           </Text>
           {isMobile && (
             <ActionIcon
